@@ -1,0 +1,27 @@
+{
+  "name": "clinic-network-analytics",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "sync": "tsx scripts/sync.ts"
+  },
+  "dependencies": {
+    "next": "^16.2.6",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "recharts": "^3.8.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.41",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "tsx": "^4.22.3",
+    "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "postcss": "8.5.10"
+  }
+}
