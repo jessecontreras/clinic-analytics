@@ -178,11 +178,11 @@ export default function Dashboard() {
     <div className="wrap">
       <div className="masthead">
         <div className="brand-title">
-          <div className="brand-mark">AE</div>
+          <div className="brand-mark">JQ</div>
           <div>
             <div className="wordmark">
-              <span>Aesthetic</span>
-              <span>Enterprises</span>
+              <span>Jesse&apos;s Quick</span>
+              <span>MVP Dashboard</span>
             </div>
           </div>
         </div>
@@ -209,8 +209,8 @@ export default function Dashboard() {
         </div>
       </div>
       <p className="sub">
-        Royalty, revenue, lead flow, and consultant performance across the AE
-        license network · updated {updatedAt}
+        Client-safe clinic analytics prototype: royalty, revenue, lead flow,
+        and consultant performance · updated {updatedAt}
       </p>
 
       {data.debug && (

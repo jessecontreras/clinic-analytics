@@ -44,6 +44,7 @@ const LIVE: Clinic = {
 
 const DEFAULT_DAYS = 30;
 const ALLOWED_DAYS = new Set([7, 30, 90]);
+const DEMO_NOW = "2026-06-07T21:00:00.000Z";
 
 /**
  * Parses and validates the `?days=` query parameter.
@@ -154,7 +155,7 @@ function delta(current: number, previous: number): KpiDeltas[keyof KpiDeltas] {
  */
 export async function GET(request: Request) {
   const days = parseDays(request);
-  const endDate = new Date();
+  const endDate = new Date(process.env.DEMO_NOW ?? DEMO_NOW);
   const beginDate = new Date(endDate.getTime() - days * 86_400_000);
   const priorEndDate = beginDate;
   const priorBeginDate = new Date(priorEndDate.getTime() - days * 86_400_000);
@@ -162,7 +163,7 @@ export async function GET(request: Request) {
   const end = endDate.toISOString();
   const priorBegin = priorBeginDate.toISOString();
   const priorEnd = priorEndDate.toISOString();
-  const mock = generateMock();
+  const mock = generateMock(endDate);
   const windowedMock = {
     ...mock,
     sales: filterToWindow(mock.sales, beginDate, endDate),

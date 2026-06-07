@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Network Analytics — Aesthetic Enterprises",
-  description: "Unified Square + GoHighLevel clinic network dashboard",
+  title: "Jesse's Quick MVP Dashboard",
+  description: "Client-safe Square + GoHighLevel clinic analytics prototype",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

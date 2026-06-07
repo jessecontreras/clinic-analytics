@@ -54,8 +54,8 @@ function rand<T>(arr: T[], rng: () => number) {
  *
  * @param n - Number of days to subtract from now.
  */
-function daysAgo(n: number) {
-  return new Date(Date.now() - n * 86_400_000).toISOString();
+function daysAgo(n: number, baseDate: Date) {
+  return new Date(baseDate.getTime() - n * 86_400_000).toISOString();
 }
 
 /**
@@ -66,12 +66,13 @@ function daysAgo(n: number) {
  * 7, 30, or 90-day windows. Won opportunities always have a matching Square sale
  * on the same customer email so the Square↔GHL join in `buildSnapshot` fires
  * correctly. Baseline entries (one per consultant) are always within the last 6
- * days, guaranteeing every consultant appears even in the narrowest 7-day window.
+ * days, including publish-day activity on June 7 in the default demo snapshot,
+ * guaranteeing every consultant appears even in the narrowest 7-day window.
  *
  * @returns Raw arrays whose shape matches the live Square and GHL adapters,
  *   ready to be passed directly to {@link buildSnapshot}.
  */
-export function generateMock() {
+export function generateMock(baseDate = new Date("2026-06-07T21:00:00.000Z")) {
   const rng = createRng(0xa37c1e);
   const clinics: Clinic[] = CLINIC_NAMES.map((name, i) => ({
     id: `clinic_${i + 1}`,
@@ -100,7 +101,7 @@ export function generateMock() {
     for (let i = 0; i < leadCount; i++) {
       const email = `lead${i}@${c.id}.example`;
       const consultant = rand(clinicConsultants, rng);
-      const created = daysAgo(Math.floor(rng() * 180));
+      const created = daysAgo(Math.floor(rng() * 180), baseDate);
       leads.push({
         id: `lead_${c.id}_${i}`,
         clinicId: c.id,
@@ -124,7 +125,7 @@ export function generateMock() {
           status: won ? "won" : rng() < 0.6 ? "lost" : "open",
           monetaryValue: 2000 + Math.floor(rng() * 8000),
           createdAt: created,
-          updatedAt: daysAgo(Math.floor(rng() * 30)),
+          updatedAt: daysAgo(Math.floor(rng() * 30), baseDate),
         });
 
         // won opps generate a matching Square sale (same email -> join works)
@@ -149,7 +150,7 @@ export function generateMock() {
 
   for (const [i, consultant] of consultants.entries()) {
     const email = `baseline${i}@${consultant.clinicId}.example`;
-    const created = daysAgo((i % 6) + 1);
+    const created = daysAgo(i % 7, baseDate);
     const amount = 3500 + i * 125;
     leads.push({
       id: `lead_${consultant.clinicId}_baseline_${i}`,
