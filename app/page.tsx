@@ -60,6 +60,56 @@ const fmtDay = (d: string) => {
 const DAY_OPTIONS = [7, 30, 90] as const;
 const CONSULTANT_PAGE_SIZE = 6;
 
+const SOURCE_ERROR_COPY: Record<
+  string,
+  { label: string; source: string; action: string }
+> = {
+  square_sales: {
+    label: "Square revenue unavailable",
+    source: "Square revenue",
+    action:
+      "Revenue from the live clinic could not be refreshed. Simulated clinics and any other available data still load.",
+  },
+  square_sales_prior: {
+    label: "Prior revenue unavailable",
+    source: "Square prior-period revenue",
+    action:
+      "The current view can still render, but KPI deltas may be incomplete until the prior-period call succeeds.",
+  },
+  ghl_leads: {
+    label: "CRM leads unavailable",
+    source: "GoHighLevel leads",
+    action:
+      "The demo CRM location is no longer active, so live lead counts cannot be refreshed. The dashboard isolates that failure and keeps the rest of the snapshot available.",
+  },
+  ghl_opportunities: {
+    label: "CRM pipeline unavailable",
+    source: "GoHighLevel opportunities",
+    action:
+      "The demo CRM location is no longer active, so live pipeline and consultant attribution cannot be refreshed. Square revenue and simulated network data still load.",
+  },
+  ghl_consultants: {
+    label: "CRM users unavailable",
+    source: "GoHighLevel consultants",
+    action:
+      "The demo CRM location is no longer active, so live consultant names cannot be refreshed. The dashboard keeps rendering with the data it can still access.",
+  },
+};
+
+const sourceErrorCopy = (key: string, raw: string) => {
+  const known = SOURCE_ERROR_COPY[key];
+  const inactiveLocation =
+    raw.includes("401") || raw.toLowerCase().includes("location is not active");
+  if (known) return known;
+  return {
+    label: "Source unavailable",
+    source: key.replace(/_/g, " "),
+    action: inactiveLocation
+      ? "That connected account is no longer active. The dashboard keeps rendering with the data it can still access."
+      : "That source could not be refreshed. The dashboard keeps rendering with the data it can still access.",
+  };
+};
+
 export default function Dashboard() {
   const [data, setData] = useState<NetworkSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
@@ -236,14 +286,17 @@ export default function Dashboard() {
             label={`${data.debug.counts.consultants} live consultants`}
             tip="GoHighLevel users mapped to the live clinic's deals — the names shown in the consultant table."
           />
-          {Object.entries(data.debug.errors).map(([k, v]) => (
-            <Chip
-              key={k}
-              label={`${k} failed`}
-              tone="warn"
-              tip={`The ${k.replace(/_/g, " ")} call failed: ${v} The rest of the data still loaded — the pipeline isolates failures. Reload to retry.`}
-            />
-          ))}
+          {Object.entries(data.debug.errors).map(([k, v]) => {
+            const copy = sourceErrorCopy(k, v);
+            return (
+              <Chip
+                key={k}
+                label={copy.label}
+                tone="warn"
+                tip={`${copy.source}: ${copy.action}`}
+              />
+            );
+          })}
         </div>
       )}
 
